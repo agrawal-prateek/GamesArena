@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Games Arena</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+          integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <link href="static/styles/bootstrap.min.css" rel="stylesheet">
+    <script src="static/scripts/jquery.min.js"></script>
+    <script src="static/scripts/bootstrap.min.js"></script>
+    <style>
+        @font-face {
+            font-family: "avenir";
+            src: url(static/styles/AvenirNextLTPro-Regular.ttf) format("truetype");
+        }
+
+        body {
+            font-family: avenir, sans-serif;
+            height: 1000px;
+            background: #e7e7e7;
+        }
+
+        nav {
+            background: #303F9F;
+        }
+
+        .white {
+            color: #fff !important;
+        }
+
+        .card {
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+        }
+
+        .card:hover {
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+        }
+
+        .top-line {
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            border-radius: 50%;
+        }
+
+        .card-title {
+            color: #212121;
+            white-space: nowrap !important;
+            width: 100% !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        .card-text {
+            color: #757575;
+        }
+
+        .editor-choice {
+            float: right;
+        }
+
+        .fa-star, .fa-star-half-alt {
+            color: #f2b01e;
+        }
+
+        #search-input {
+            border: none;
+            border-bottom-right-radius: 70px;
+            border-top-right-radius: 70px;
+            outline: none;
+            padding-left: 5px;
+            width: 70%;
+            transition: width 500ms;
+        }
+
+        #search-input:hover,
+        #search-input:focus {
+            width: 100%;
+        }
+
+        #min, #max {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+    <a class="navbar-brand white" href="javascript:void(0)">Games Arena</a>
+    <button class="navbar-toggler navbar-toggler-right collapsed" type="button" data-toggle="collapse"
+            data-target="#navb" aria-expanded="false">
+        <span class="navbar-toggler-icon" style="color: white"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="navb" style="">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" id="search-input" type="text" placeholder="Search">
+        </form>
+    </div>
+</nav>
+<br><br><br>
+<div class="container-fluid">
+    <h2 id="main-heading"><strong>Explore Games</strong></h2>
+    <hr class="top-line">
+    <div class="row">
+        <div class="col-sm-2">
+            <h5 onclick="openNav()" id="filter" class="filterclass">
+                <i class="fas fa-filter"></i>
+                <a href="#" style="color: #212121">Filters</a>
+            </h5>
+        </div>
+        <div class="col-sm-10">
+            <p>Score:
+                <span><input placeholder="min" id="min" class="maxmin" type="number"></span>
+                <span><input placeholder="max" id="max" class="maxmin" type="number"></span>
+                 <span style="margin-left: 100px;">
+                Platforms:
+                <select id="pla">
+
+                </select>
+            </span>
+            </p>
+
+
+        </div>
+    </div>
+    <br>
+    <div class="row games-row" id="main"></div>
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $("#search-input").on("keyup", function () {
+            let value = $(this).val().toLowerCase();
+            $(".card-title").filter(function () {
+                $("#card" + this.id).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        $(".maxmin").on("keyup", function () {
+            let minval = $('#min').val();
+            let maxval = $('#max').val();
+            if (minval === '')
+                minval = -1;
+            if (maxval === '')
+                maxval = 500;
+
+            $(".card-score").filter(function () {
+                $("#card" + this.id).toggle($(this).text() >= minval && $(this).text() <= maxval);
+            });
+        });
+    });
+</script>
+<script>
+    function f(pl) {
+        console.log(1);
+            $(".ppp").filter(function () {
+                $("#card" + this.id).toggle($(this).text()!==pl);
+            });
+    }
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+    }
+
+    let title, url, platform, score, genre, release_year, element;
+    let platforms = [];
+    $.getJSON("http://starlord.hackerearth.com/gamesext", function (data) {
+        for (let i = 0; i < data.length; i++) {
+            title = data[i]['title'];
+            url = data[i]['url'];
+            platform = data[i]['platform'];
+            platforms.push(platform);
+            score = data[i]['score'];
+            genre = data[i]['genre'];
+            release_year = data[i]['release_year'];
+            element = `<div class="col-sm-4" id="card${i}">
+            <div class="card" data-toggle="tooltip" title="${title}">
+                <div class="card-body">
+                    <h4 class="card-title" id="${i}">${title}</h4>
+                    <hr class="top-line">
+                    <p class="card-text">Platform: <span class="ppp"  id="${i}">${platform}</span> </p>
+                    <p class="card-text">Score: <span class="card-score" id="${i}">${score}</span> </p>
+                    <p class="card-text">Genre: ${genre}</p>
+                    <p class="card-text">Release Year: ${release_year}</p>
+                    <a href="${url}" class="card-link">Explore</a>`;
+            if (data[i]['editors_choice'] === 'Y')
+                element += `<a class="editor-choice"><i class="fa fa-star fa-w-18"></i><i class="fas fa-star-half-alt"></i>
+                        Editors Choice</a>`;
+            element += `</div></div></div>`;
+            $(".games-row").append(element);
+        }
+        platforms = platforms.filter(onlyUnique);
+        localStorage.setItem("platform", platforms);
+        for(var i=0; i<platforms.length; i++)
+            $('#pla').append("<option><a onclick=\"f(\""+platforms[i]+"\")\">"+platforms[i]+"</a></option>");
+    });
+</script>
+</html>
